@@ -1,0 +1,2 @@
+# StaticAnalysisforCI
+持续集成中Klocwork静态分析驱动模块
