@@ -9,7 +9,7 @@ import re
 import logging
 import time
 import subprocess
-import update_role_assignment
+from klocwork.update_role_assignment import update_role_assignment
 
 
 def main():
@@ -209,7 +209,7 @@ def createPrj():
                          KlocworkProjectName)
             if re.match(r'^([A-Z]{2}|\d{1,2}B)_.*', KlocworkProjectName):
                 account = 'group-' + KlocworkProjectName.strip().split('_')[0]
-                update_role_assignment.update_role_assignment(
+                update_role_assignment(
                     KlocworkProjectServerHost,
                     KlocworkProjectServerPort,
                     user, role_name, account,
