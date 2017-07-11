@@ -4,26 +4,29 @@
 ## 目录
 * [介绍](#介绍)
 * [功能](#功能)
-* [变量](#变量)
 * [用法](#用法)
 * [Jenkins插件](#Jenkins插件)
 
 ### 介绍
 ----
-这个项目是做什么的
+StaticAnalysisforCI脚本用于在[Jenkins](https://jenkins.io/index.html)等持续集成（CI）工具中驱动[Klocwork](https://www.klocwork.com/)进行代码静态分析。
 
 ### 功能
 ----
-都有哪些功能
-
-### 变量
-----
-变量解释
+StaticAnalysisforCI脚本主要功能：
+    1. 项目编译构建
+    1. 项目建立与分配权限
+    1. 缺陷检测规则选取
+    1. 生成.out文件
+    1. 执行代码静态扫描
+    1. 缺陷定位引入者
+    1. 缺陷结果邮件推送
 
 ### 用法
 ----
-讲解用法
+配置好analysis.bat/analysis.sh文件，放入配置管理库，在Jenkins中选择增加构建步骤Execute Windows batch command/Execute shell，执行脚本。
 
 ### Jenkins插件
 ----
-jenkins具有类似功能的插件介绍
+Jenkins具有类似功能的插件[Klocwork Community](https://plugins.jenkins.io/klocwork)。
+Klocwork Community插件+Pipeline才是持续集成静态分析的正确打开方式。
