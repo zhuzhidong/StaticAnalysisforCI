@@ -25,7 +25,7 @@ StaticAnalysisforCI脚本主要功能：
 
 ### 用法
 ----
-配置好analysis.bat/analysis.sh文件，放入配置管理库，在Jenkins中选择增加构建步骤Execute Windows batch command/Execute shell，执行脚本。
+配置好analysis.bat/analysis.sh文件，放入配置管理库，在Jenkins中选择增加构建步骤Execute Windows batch command/Execute shell，执行配置好的batch或shell脚本。
 
 ### Jenkins插件
 ----
