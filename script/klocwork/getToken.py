@@ -9,7 +9,7 @@ import os.path
 def getToken(host='localhost', port=8080, user='Administrator'):
     ltoken = os.path.normpath(os.path.expanduser("~/.klocwork/ltoken"))
     with open(ltoken, 'r') as ltokenFile:
-        for r in ltokenFile:
+        for r in ltokenFile.readlines():
             rd = r.strip().split(';')
             if rd[0] == host and rd[1] == str(port) and rd[2] == user:
                 return rd[3]

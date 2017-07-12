@@ -110,7 +110,7 @@ def init():
                       KlocworkProjectName)
         sys.exit(1)
     global CreateProjectCommand, BuildProjectCommand
-    global BuildTime_ForKW, LoadDatabaseCommand
+    global BuildTime, BuildTime_ForKW, LoadDatabaseCommand
     CreateProjectCommand = (
         "kwadmin --host %s --port %s "
         "create-project %s --language %s --encoding %s")\
@@ -128,6 +128,7 @@ def init():
            KlocworkProjectName, SourceEncoding, JobNumber,
            KlocworkTablesPath, os.path.join(SourcePath, 'kwinject.out'), )
     BuildTime_ForKW = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+    BuildTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     LoadDatabaseCommand = "kwadmin --host %s --port %s load %s %s --name %s"\
         % (KlocworkProjectServerHost, KlocworkProjectServerPort,
            KlocworkProjectName, KlocworkTablesPath, BuildTime_ForKW, )
@@ -266,8 +267,10 @@ def importSOW():
 
 
 def buildPrj():
+    global ReportPath, JarPath
     ReportPath = os.path.join(
         ProjectPath, os.path.join('report', BuildTime_ForKW))
+    JarPath = os.path.join(KlocworkScriptsPath, 'jar')
     if not os.path.exists(ReportPath):
         os.makedirs(ReportPath, mode=0o777)
     BuildSpecificationPath = os.path.join(SourcePath, 'kwinject.out')
@@ -298,7 +301,7 @@ def buildPrj():
             "java -jar %s --project %s --klocworkhost %s --klocworkPort  %s "
             "--license-host %s --license-port %s --build %s --query \"%s\" "
             "--outputXmlFile \"%s\" --projects_root \"%s\"")\
-            % (os.path.join(KlocworkScriptsPath, 'KWInspectReport.jar'),
+            % (os.path.join(JarPath, 'KWInspectReport.jar'),
                KlocworkProjectName,
                KlocworkProjectServerHost, KlocworkProjectServerPort,
                KlocworkLicenseServerHost, KlocworkLicenseServerPort,
@@ -321,11 +324,56 @@ def buildPrj():
 
 
 def getUsers():
-    pass
+    global MailList
+    MailList = []
+    re_owner = re.compile(r'^[ \t\r\n]*<owner>(.+)</owner>')
+    with open(os.path.join(ReportPath, 'issues.xml'), 'r') as xml:
+        for line in xml.readlines:
+            if re_owner.match(line):
+                owner_name = re_owner.match(line).group(1)
+                if owner_name not in RejectEmailName:
+                    MailList.append(owner_name + '@' + EmailDomain)
+    logging.debug("MailList = %s" % ','.join(MailList))
+    logging.info("Get %s Users success!" % KlocworkProjectName)
 
 
 def genHTML():
-    pass
+    global XsltPath
+    XsltPath = os.path.join(KlocworkScriptsPath, 'xslt')
+    genReportCommand = (
+        "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s "
+        "-o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"")\
+        % (os.path.join(JarPath, 'saxon9he.jar'),
+           os.path.join(ReportPath, 'issues.xml'),
+           os.path.join(XsltPath, 'report.xslt'),
+           os.path.join(ReportPath, 'report.html'),
+           KlocworkProjectName,
+           ProjectDescription,
+           BuildTime, )
+    genIssuesCommand = (
+        "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s "
+        "-o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"")\
+        % (os.path.join(JarPath, 'saxon9he.jar'),
+           os.path.join(ReportPath, 'issues.xml'),
+           os.path.join(XsltPath, 'issues.xslt'),
+           os.path.join(ReportPath, 'issues.html'),
+           KlocworkProjectName,
+           ProjectDescription,
+           BuildTime, )
+    p_grc = subprocess.Popen(genReportCommand)
+    p_grc.wait()
+    if p_grc.returncode != 0:
+        logging.error("Gen report.html failed: %d" % p_grc.returncode)
+        sys.exit(1)
+    else:
+        logging.info("Gen project %s report complete!" % KlocworkProjectName)
+    p_gic = subprocess.Popen(genIssuesCommand)
+    p_gic.wait()
+    if p_gic.returncode != 0:
+        logging.error("Gen issues.html failed: %d" % p_gic.returncode)
+        sys.exit(1)
+    else:
+        logging.info("Gen project %s issues complete!" % KlocworkProjectName)
 
 
 def mail():
