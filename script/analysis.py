@@ -377,7 +377,21 @@ def genHTML():
 
 
 def mail():
-    pass
+    if int(RunningMode) <= 1:
+        subject = "%s:Klocwork %s %s"\
+                  % (JenkinsServerName, ProjectDescription, BuildTime)
+        mailtxt = os.path.join(ReportPath, 'report.html')
+        attachmentCtype = "text/html"
+        attachmentFilename = "issues.html"
+        attach = os.path.join(ReportPath, attachmentFilename)
+        if os.path.getsize(attach) >= 2048000:
+            attachmentCtype = "application/zip"
+            attachmentFilename = "issues.zip"
+            attach = os.path.join(ReportPath, attachmentFilename)
+        logging.debug("attachmentCtype = %s; "
+                      "attachmentFilename = %s; "
+                      "attach = %s"
+                      % (attachmentCtype, attachmentFilename, attach))
 
 
 if __name__ == "__main__":
