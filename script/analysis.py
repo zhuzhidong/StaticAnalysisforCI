@@ -387,11 +387,26 @@ def mail():
         if os.path.getsize(attach) >= 2048000:
             attachmentCtype = "application/zip"
             attachmentFilename = "issues.zip"
+            zipFile(attach)
             attach = os.path.join(ReportPath, attachmentFilename)
         logging.debug("attachmentCtype = %s; "
                       "attachmentFilename = %s; "
                       "attach = %s"
                       % (attachmentCtype, attachmentFilename, attach))
+        if RunningMode == 0:
+            pass
+        elif RunningMode == 1:
+            mailTo = CCEmailAddress
+        sendMail(subject, mailtxt, attachmentCtype,
+                 attachmentFilename, attach, mailTo)
+
+
+def zipFile():
+    pass
+
+
+def sendMail():
+    pass
 
 
 if __name__ == "__main__":
