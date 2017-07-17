@@ -9,6 +9,7 @@ import re
 import logging
 import time
 import subprocess
+import zipfile
 from klocwork.update_role_assignment import update_role_assignment
 
 
@@ -394,15 +395,20 @@ def mail():
                       "attach = %s"
                       % (attachmentCtype, attachmentFilename, attach))
         if RunningMode == 0:
-            pass
+            mailTo = ','.join(MailList)
+            if '' == mailTo or '*' == RejectEmailName:
+                mailTo = CCEmailAddress
         elif RunningMode == 1:
             mailTo = CCEmailAddress
         sendMail(subject, mailtxt, attachmentCtype,
                  attachmentFilename, attach, mailTo)
 
 
-def zipFile():
-    pass
+def zipFile(attach):
+    (filepath, filename) = os.path.split(os.path.abspath(attach))
+    zipfilename = os.path.splitext(filename)[0] + '.zip'
+    with zipfile.ZipFile(os.path.join(filepath, zipfilename), 'w') as zipped:
+        zipped.write(attach)
 
 
 def sendMail():
