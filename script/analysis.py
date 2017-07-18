@@ -10,6 +10,9 @@ import logging
 import time
 import subprocess
 import zipfile
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from klocwork.update_role_assignment import update_role_assignment
 
 
@@ -390,18 +393,22 @@ def mail():
             attachmentFilename = "issues.zip"
             zipFile(attach)
             attach = os.path.join(ReportPath, attachmentFilename)
-        logging.debug("attachmentCtype = %s; "
-                      "attachmentFilename = %s; "
-                      "attach = %s"
-                      % (attachmentCtype, attachmentFilename, attach))
+        logging.debug(
+            "subject = %s "
+            "attachmentCtype = %s "
+            "attachmentFilename = %s "
+            "attach = %s"
+            % (subject, attachmentCtype, attachmentFilename, attach, ))
         if RunningMode == 0:
             mailTo = ','.join(MailList)
             if '' == mailTo or '*' == RejectEmailName:
                 mailTo = CCEmailAddress
         elif RunningMode == 1:
             mailTo = CCEmailAddress
+        logging.debug("mailTo = %s " % mailTo)
         sendMail(subject, mailtxt, attachmentCtype,
                  attachmentFilename, attach, mailTo)
+        logging.info("Send issues results to %s complete!" % MailList)
 
 
 def zipFile(attach):
@@ -409,10 +416,12 @@ def zipFile(attach):
     zipfilename = os.path.splitext(filename)[0] + '.zip'
     with zipfile.ZipFile(os.path.join(filepath, zipfilename), 'w') as zipped:
         zipped.write(attach)
+    logging.info("Zip %s complete!" % filename)
 
 
-def sendMail():
-    pass
+def sendMail(subject, mailtxt, attachmentCtype,
+             attachmentFilename, attach, mailTo):
+    message = MIMEMultipart()
 
 
 if __name__ == "__main__":
