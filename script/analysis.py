@@ -404,6 +404,8 @@ def mail():
             mailTo = ','.join(MailList)
             if '' == mailTo or '*' == RejectEmailName:
                 mailTo = CCEmailAddress
+            else:
+                mailTo += ',' + CCEmailAddress
         elif RunningMode == 1:
             mailTo = CCEmailAddress
         logging.debug("mailTo = %s " % mailTo)
