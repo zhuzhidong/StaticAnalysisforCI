@@ -13,6 +13,7 @@ import zipfile
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.header import Header
 from klocwork.update_role_assignment import update_role_assignment
 
 
@@ -408,7 +409,7 @@ def mail():
         logging.debug("mailTo = %s " % mailTo)
         sendMail(subject, mailtxt, attachmentCtype,
                  attachmentFilename, attach, mailTo)
-        logging.info("Send issues results to %s complete!" % MailList)
+        logging.info("Send issues results to %s complete!" % mailTo)
 
 
 def zipFile(attach):
@@ -422,6 +423,8 @@ def zipFile(attach):
 def sendMail(subject, mailtxt, attachmentCtype,
              attachmentFilename, attach, mailTo):
     message = MIMEMultipart()
+    sender = EmailSender
+
 
 
 if __name__ == "__main__":
