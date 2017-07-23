@@ -425,8 +425,7 @@ def zipFile(attach):
 def sendMail(subject, mailtxt, attachmentCtype,
              attachmentFilename, attach, mailTo):
     message = MIMEMultipart()
-    sender = EmailSender
-
+    message.attach
 
 
 if __name__ == "__main__":
