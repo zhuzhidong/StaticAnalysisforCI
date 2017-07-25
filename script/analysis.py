@@ -429,7 +429,10 @@ def sendMail(subject, mailtxt, attachmentCtype,
     message['Subject'] = subject
     message['From'] = EmailSender
     message['To'] = mailTo
-    message.attach()
+    # message.attach()
+    smtp = smtplib.SMTP(EmailSmtp)
+    smtp.login(EmailAuthUserID, EmailAuthUserPassword)
+    smtp.sendmail(EmailSender, mailTo, message.as_string())
 
 
 if __name__ == "__main__":
