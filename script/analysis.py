@@ -388,19 +388,19 @@ def mail():
                   % (JenkinsServerName, ProjectDescription, BuildTime)
         mailtxt = os.path.join(ReportPath, 'report.html')
         attachmentCtype = "text/html"
-        attachmentFilename = "issues.html"
-        attach = os.path.join(ReportPath, attachmentFilename)
+        attachFilename = "issues.html"
+        attach = os.path.join(ReportPath, attachFilename)
         if os.path.getsize(attach) >= 2048000:
             attachmentCtype = "application/zip"
-            attachmentFilename = "issues.zip"
+            attachFilename = "issues.zip"
             zipFile(attach)
-            attach = os.path.join(ReportPath, attachmentFilename)
+            attach = os.path.join(ReportPath, attachFilename)
         logging.debug(
             "subject = %s "
             "attachmentCtype = %s "
-            "attachmentFilename = %s "
+            "attachFilename = %s "
             "attach = %s"
-            % (subject, attachmentCtype, attachmentFilename, attach, ))
+            % (subject, attachmentCtype, attachFilename, attach, ))
         if RunningMode == 0:
             mailTo = ','.join(MailList)
             if '' == mailTo or '*' == RejectEmailName:
@@ -411,7 +411,7 @@ def mail():
             mailTo = CCEmailAddress
         logging.debug("mailTo = %s " % mailTo)
         sendMail(subject, mailtxt, attachmentCtype,
-                 attachmentFilename, attach, mailTo)
+                 attachFilename, attach, mailTo)
         logging.info("Send issues results to %s complete!" % mailTo)
 
 
@@ -424,15 +424,21 @@ def zipFile(attach):
 
 
 def sendMail(subject, mailtxt, attachmentCtype,
-             attachmentFilename, attach, mailTo):
+             attachFilename, attach, mailTo):
     message = MIMEMultipart()
     message['Subject'] = subject
     message['From'] = EmailSender
     message['To'] = mailTo
-    # message.attach()
+    content = MIMEText(open(mailtxt, 'rb').read(), 'base64', 'GB2312')
+    message.attach(content)
+    att = MIMEText(open(attach, 'rb').read(), 'base64', 'GB2312')
+    att["Content-Type"] = 'application/octet-stream'
+    att["Content-Disposition"] = 'attachment; filename="%s"' % attachFilename
+    message.attach(att)
     smtp = smtplib.SMTP(EmailSmtp)
     smtp.login(EmailAuthUserID, EmailAuthUserPassword)
-    smtp.sendmail(EmailSender, mailTo, message.as_string())
+    smtp.sendmail(EmailSender, mailTo.split(','), message.as_string())
+    smtp.quit()
 
 
 if __name__ == "__main__":
