@@ -86,8 +86,7 @@ def main():
     KlocworkTablesPath = os.path.join(ProjectPath, 'tables')
     # Print Variables #
     for i in range(0, 28):
-        print("==========analysis.py: "
-              "ParameterArray[%s] = %s" % (str(i), sys.argv[i]), flush=True)
+        print("==========analysis.py: ParameterArray[%s] = %s" % (str(i), sys.argv[i]), flush=True) # noqa
     print("*********************Tables*****************", flush=True)
     print(KlocworkTablesPath, flush=True)
     print("********************************************", flush=True)
@@ -96,13 +95,11 @@ def main():
     LogFilePath = os.path.join(ProjectPath, 'analysis.log')
     logging.basicConfig(filename=LogFilePath, filemode='w',
                         level=logging.DEBUG,
-                        format='==========%(asctime)s [%(funcName)s]'
-                        '[%(lineno)d] [%(levelname)s]:%(message)s',
+                        format='==========%(asctime)s [%(funcName)s] [%(lineno)d] [%(levelname)s]:%(message)s', # noqa
                         datefmt='%Y-%d-%m %I:%M:%S %p')
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(fmt='==========%(asctime)s [%(funcName)s]'
-                                  '[%(lineno)d] [%(levelname)s]:%(message)s',
+    formatter = logging.Formatter(fmt='==========%(asctime)s [%(funcName)s] [%(lineno)d] [%(levelname)s]:%(message)s',  # noqa
                                   datefmt='%Y-%d-%m %I:%M:%S %p')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
@@ -110,32 +107,15 @@ def main():
 
 def init():
     if re.match(r'\w*[\u4e00-\u9fa5]+', KlocworkProjectName):
-        logging.error("Project Name \"%s\" has Chinese character(s)!" %
-                      KlocworkProjectName)
+        logging.error("Project Name \"%s\" has Chinese character(s)!" % KlocworkProjectName)    # noqa
         sys.exit(1)
     global CreateProjectCommand, BuildProjectCommand
     global BuildTime, BuildTime_ForKW, LoadDatabaseCommand
-    CreateProjectCommand = (
-        "kwadmin --host %s --port %s "
-        "create-project %s --language %s --encoding %s")\
-        % (KlocworkProjectServerHost,
-           KlocworkProjectServerPort,
-           KlocworkProjectName,
-           SourceLanguage,
-           SourceEncoding, )
-    BuildProjectCommand = (
-        "kwbuildproject --host %s --port %s "
-        "--license-host %s --license-port %s --project %s --encoding %s "
-        "--incremental --jobs-num %s --tables-directory %s %s")\
-        % (KlocworkProjectServerHost, KlocworkProjectServerPort,
-           KlocworkLicenseServerHost, KlocworkLicenseServerPort,
-           KlocworkProjectName, SourceEncoding, JobNumber,
-           KlocworkTablesPath, os.path.join(SourcePath, 'kwinject.out'), )
+    CreateProjectCommand = "kwadmin --host %s --port %s create-project %s --language %s --encoding %s" % (KlocworkProjectServerHost, KlocworkProjectServerPort, KlocworkProjectName, SourceLanguage, SourceEncoding, )  # noqa
+    BuildProjectCommand = "kwbuildproject --host %s --port %s --license-host %s --license-port %s --project %s --encoding %s --incremental --jobs-num %s --tables-directory %s %s" % (KlocworkProjectServerHost, KlocworkProjectServerPort, KlocworkLicenseServerHost, KlocworkLicenseServerPort, KlocworkProjectName, SourceEncoding, JobNumber, KlocworkTablesPath, os.path.join(SourcePath, 'kwinject.out'), )   # noqa
     BuildTime_ForKW = time.strftime('%Y%m%d_%H%M%S', time.localtime())
     BuildTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    LoadDatabaseCommand = "kwadmin --host %s --port %s load %s %s --name %s"\
-        % (KlocworkProjectServerHost, KlocworkProjectServerPort,
-           KlocworkProjectName, KlocworkTablesPath, BuildTime_ForKW, )
+    LoadDatabaseCommand = "kwadmin --host %s --port %s load %s %s --name %s" % (KlocworkProjectServerHost, KlocworkProjectServerPort, KlocworkProjectName, KlocworkTablesPath, BuildTime_ForKW, )   # noqa
     logging.debug('CleanCommand = %s' % CleanCommand)
     logging.debug('KlocworkMakeCommand = %s' % KlocworkMakeCommand)
     logging.debug('CreateProjectCommand = %s' % CreateProjectCommand)
@@ -180,15 +160,12 @@ def genOUT():
         else:
             logging.info("Generate build-specification file success!")
     else:
-        logging.warning("KlocworkMakeCommand not set. "
-                        "Attention! kwinject.out may not exist!")
+        logging.warning("KlocworkMakeCommand not set. Attention! kwinject.out may not exist!")  # noqa
 
 
 def createPrj():
     isExist = False
-    ListProjectCommand = (
-        "kwadmin --host %s --port %s list-projects")\
-        % (KlocworkProjectServerHost, KlocworkProjectServerPort, )
+    ListProjectCommand = "kwadmin --host %s --port %s list-projects" % (KlocworkProjectServerHost, KlocworkProjectServerPort, ) # noqa
     output = os.popen(ListProjectCommand)  # implemented using subprocess.Popen
     for project in output.readlines():
         if KlocworkProjectName == project.strip():
@@ -197,8 +174,7 @@ def createPrj():
             break
 
     if not isExist:
-        logging.info("Project %s doesn't exist! Create the project!"
-                     % KlocworkProjectName)
+        logging.info("Project %s doesn't exist! Create the project!" % KlocworkProjectName) # noqa
         p_cpc = subprocess.Popen(CreateProjectCommand)
         p_cpc.wait()
         if p_cpc.returncode != 0:
@@ -210,15 +186,10 @@ def createPrj():
             role_name = "Developer"
             group = "false"
             remove = "false"
-            logging.info("Create project %s successfully!" %
-                         KlocworkProjectName)
+            logging.info("Create project %s successfully!" % KlocworkProjectName)   # noqa
             if re.match(r'^([A-Z]{2}|\d{1,2}B)_.*', KlocworkProjectName):
                 account = 'group-' + KlocworkProjectName.strip().split('_')[0]
-                update_role_assignment(
-                    KlocworkProjectServerHost,
-                    KlocworkProjectServerPort,
-                    user, role_name, account,
-                    group, project, remove)
+                update_role_assignment(KlocworkProjectServerHost, KlocworkProjectServerPort, user, role_name, account, group, project, remove)  # noqa
                 # host name vs IP address
             else:
                 logging.info("Permission of project %s not set. skipped!"
@@ -229,16 +200,11 @@ def createPrj():
 
 def genSOWFromSVN():
     os.system("svn update")
-    GenXmlCommand = "svn info -R --xml %s > %s" % (
-        SourcePath, os.path.join(ProjectPath, 'owner.xml'), )
+    GenXmlCommand = "svn info -R --xml %s > %s" % (SourcePath, os.path.join(ProjectPath, 'owner.xml'), )    # noqa
     p_gxc = subprocess.Popen(GenXmlCommand)
     p_gxc.wait()
 
-    ExtractSowCmd = "java -jar %s -s:%s -xsl:%s -o:%s"\
-        % (os.path.join(KlocworkScriptsPath, 'saxon9he.jar'),
-           os.path.join(ProjectPath, 'owner.xml'),
-           os.path.join(KlocworkScriptsPath, 'extract-svn-owners.xsl'),
-           os.path.join(ProjectPath, '%s.sow' % KlocworkProjectName), )
+    ExtractSowCmd = "java -jar %s -s:%s -xsl:%s -o:%s" % (os.path.join(KlocworkScriptsPath, 'saxon9he.jar'), os.path.join(ProjectPath, 'owner.xml'), os.path.join(KlocworkScriptsPath, 'extract-svn-owners.xsl'), os.path.join(ProjectPath, '%s.sow' % KlocworkProjectName), )  # noqa
     p_esc = subprocess.Popen(ExtractSowCmd)
     p_esc.wait()
     logging.info("SOW file ready!")
@@ -250,14 +216,8 @@ def genSOW():
 
 
 def importSOW():
-    if os.path.exists(os.path.join(ProjectPath,
-                                   '%s.sow' % KlocworkProjectName)):
-        ImportSowCmd = "kwadmin --host %s --port %s import-config %s %s" \
-                       % (KlocworkProjectServerHost,
-                          KlocworkProjectServerPort,
-                          KlocworkProjectName,
-                          os.path.join(ProjectPath,
-                                       '%s.sow' % KlocworkProjectName), )
+    if os.path.exists(os.path.join(ProjectPath, '%s.sow' % KlocworkProjectName)):   # noqa
+        ImportSowCmd = "kwadmin --host %s --port %s import-config %s %s" % (KlocworkProjectServerHost, KlocworkProjectServerPort, KlocworkProjectName, os.path.join(ProjectPath, '%s.sow' % KlocworkProjectName), ) # noqa
         p_isc = subprocess.Popen(ImportSowCmd)
         p_isc.wait()
         if p_isc.returncode != 0:
@@ -267,13 +227,12 @@ def importSOW():
         else:
             logging.info("Import %s.sow success!" % KlocworkProjectName)
     else:
-        logging.info("Can NOT find $KlocworkProjectName.sow, skip sow info!")
+        logging.info("Can NOT find %s.sow, skip sow info!" % KlocworkProjectName)   # noqa
 
 
 def buildPrj():
     global ReportPath, JarPath
-    ReportPath = os.path.join(
-        ProjectPath, os.path.join('report', BuildTime_ForKW))
+    ReportPath = os.path.join(ProjectPath, os.path.join('report', BuildTime_ForKW)) # noqa
     JarPath = os.path.join(KlocworkScriptsPath, 'jar')
     if not os.path.exists(ReportPath):
         os.makedirs(ReportPath, mode=0o777)
@@ -301,16 +260,7 @@ def buildPrj():
             logging.info("Load project %s complete!" % KlocworkProjectName)
 
         query = "status:+Analyze,+Fix grouping:off"
-        issuesExportCommand = (
-            "java -jar %s --project %s --klocworkhost %s --klocworkPort  %s "
-            "--license-host %s --license-port %s --build %s --query \"%s\" "
-            "--outputXmlFile \"%s\" --projects_root \"%s\"")\
-            % (os.path.join(JarPath, 'KWInspectReport.jar'),
-               KlocworkProjectName,
-               KlocworkProjectServerHost, KlocworkProjectServerPort,
-               KlocworkLicenseServerHost, KlocworkLicenseServerPort,
-               BuildTime_ForKW, query, os.path.join(ReportPath, 'issues.xml'),
-               KlocworkProjectsRoot, )
+        issuesExportCommand = "java -jar %s --project %s --klocworkhost %s --klocworkPort  %s --license-host %s --license-port %s --build %s --query \"%s\" --outputXmlFile \"%s\" --projects_root \"%s\"" % (os.path.join(JarPath, 'KWInspectReport.jar'), KlocworkProjectName, KlocworkProjectServerHost, KlocworkProjectServerPort, KlocworkLicenseServerHost, KlocworkLicenseServerPort, BuildTime_ForKW, query, os.path.join(ReportPath, 'issues.xml'), KlocworkProjectsRoot, )    # noqa
 
         logging.debug('issuesExportCommand = %s' % issuesExportCommand)
 
@@ -322,8 +272,7 @@ def buildPrj():
         else:
             logging.info("Export project %s complete!" % KlocworkProjectName)
     else:
-        logging.error("Specification file %s does not exist!" %
-                      BuildSpecificationPath)
+        logging.error("Specification file %s does not exist!" % BuildSpecificationPath) # noqa
         sys.exit(1)
 
 
@@ -344,26 +293,8 @@ def getUsers():
 def genHTML():
     global XsltPath
     XsltPath = os.path.join(KlocworkScriptsPath, 'xslt')
-    genReportCommand = (
-        "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s "
-        "-o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"")\
-        % (os.path.join(JarPath, 'saxon9he.jar'),
-           os.path.join(ReportPath, 'issues.xml'),
-           os.path.join(XsltPath, 'report.xslt'),
-           os.path.join(ReportPath, 'report.html'),
-           KlocworkProjectName,
-           ProjectDescription,
-           BuildTime, )
-    genIssuesCommand = (
-        "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s "
-        "-o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"")\
-        % (os.path.join(JarPath, 'saxon9he.jar'),
-           os.path.join(ReportPath, 'issues.xml'),
-           os.path.join(XsltPath, 'issues.xslt'),
-           os.path.join(ReportPath, 'issues.html'),
-           KlocworkProjectName,
-           ProjectDescription,
-           BuildTime, )
+    genReportCommand = "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s -o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"" % (os.path.join(JarPath, 'saxon9he.jar'), os.path.join(ReportPath, 'issues.xml'), os.path.join(XsltPath, 'report.xslt'), os.path.join(ReportPath, 'report.html'), KlocworkProjectName, ProjectDescription, BuildTime, )   # noqa
+    genIssuesCommand = "java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s -o:%s projectName=\"%s\" projectDescription=\"%s\" buildTime=\"%s\"" % (os.path.join(JarPath, 'saxon9he.jar'), os.path.join(ReportPath, 'issues.xml'), os.path.join(XsltPath, 'issues.xslt'), os.path.join(ReportPath, 'issues.html'), KlocworkProjectName, ProjectDescription, BuildTime, )   # noqa
     p_grc = subprocess.Popen(genReportCommand)
     p_grc.wait()
     if p_grc.returncode != 0:
@@ -382,8 +313,7 @@ def genHTML():
 
 def mail():
     if int(RunningMode) <= 1:
-        subject = "%s:Klocwork %s %s"\
-                  % (JenkinsServerName, ProjectDescription, BuildTime)
+        subject = "%s:Klocwork %s %s" % (JenkinsServerName, ProjectDescription, BuildTime)  # noqa
         mailtxt = os.path.join(ReportPath, 'report.html')
         attachmentCtype = "text/html"
         attachFilename = "issues.html"
@@ -393,12 +323,7 @@ def mail():
             attachFilename = "issues.zip"
             zipFile(attach)
             attach = os.path.join(ReportPath, attachFilename)
-        logging.debug(
-            "subject = %s "
-            "attachmentCtype = %s "
-            "attachFilename = %s "
-            "attach = %s"
-            % (subject, attachmentCtype, attachFilename, attach, ))
+        logging.debug("subject = %s attachmentCtype = %s attachFilename = %s attach = %s" % (subject, attachmentCtype, attachFilename, attach, ))   # noqa
         if RunningMode == 0:
             mailTo = ','.join(MailList)
             if '' == mailTo or '*' == RejectEmailName:
@@ -408,8 +333,7 @@ def mail():
         elif RunningMode == 1:
             mailTo = CCEmailAddress
         logging.debug("mailTo = %s " % mailTo)
-        sendMail(subject, mailtxt, attachmentCtype,
-                 attachFilename, attach, mailTo)
+        sendMail(subject, mailtxt, attachmentCtype, attachFilename, attach, mailTo) # noqa
         logging.info("Send issues results to %s complete!" % mailTo)
 
 
@@ -421,8 +345,7 @@ def zipFile(attach):
     logging.info("Zip %s complete!" % filename)
 
 
-def sendMail(subject, mailtxt, attachmentCtype,
-             attachFilename, attach, mailTo):
+def sendMail(subject, mailtxt, attachmentCtype, attachFilename, attach, mailTo):    # noqa
     message = MIMEMultipart()
     message['Subject'] = subject
     message['From'] = EmailSender
